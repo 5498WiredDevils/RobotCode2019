@@ -1,0 +1,9 @@
+[
+  {
+    "name": "example_proj",
+    "file": "C:\\Users\\Computer\\Documents\\java_practice\\example_proj\\build\\libs\\example_proj.jar",
+    "extensions": [],
+    "librarydir": "C:\\Users\\Computer\\Documents\\java_practice\\example_proj\\build\\tmp\\jniExtractDir",
+    "mainclass": "frc.robot.Main"
+  }
+]
