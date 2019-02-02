@@ -51,15 +51,16 @@ lower.setInvertedMotor(RobotDrive.leftGroup, true);
 
 //upper
 
-Servo Servo1 = new Servo(1);
+Servo gear = new Servo(1);
 
 Sparx fly = new Sparx(2);
 
 WPI_TalonSRX leftLift = new WPI_TalonSRX(5);
 WPI_TalonSRX rightLift = new WPI_TalonSRX(6);
 SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
-     
-  private final Joystick m_stick = new Joystick(0);
+    //pnew
+    Solenoid frontS = new Solenoid(0);
+    Solenoid backS = new Solenoid(1);
   private final Timer m_timer = new Timer();
 
   /**
@@ -107,27 +108,55 @@ SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
    //lower
    //lower.arcadeDrive(joy.getY(),joy.getX());
 
-   if(xbox.getRawButtpn(0))
+   if(xbox.getRawButton(0))
     {
-     lower.arcadeDrive(Joy.getY()*0.5,joy.getX();}
-    else{
-    
-      lower.arcadeDrive(joy.getY(),joy.getX());}
-   
+     lower.arcadeDrive(Joy.getY()*0.5,joy.getX();
+    }
+    else
+    {
+      lower.arcadeDrive(joy.getY(),joy.getX());
+    }
    //upper
    
    //lift
-   if(xbox.getRawAxis(1)>0.25){
-     lift.set(-1);}
-     
-   else if(xbox.getRawAxis(1)< -0.25){
-     lift.set(1);}
-   else{
-     lift.set(0);}
+   if(xbox.getRawAxis(1)>0.25)
+   {
+     lift.set(-1);
+   }
+   else if(xbox.getRawAxis(1)< -0.25)
+   {
+     lift.set(1);
+   }
+   else
+   {
+     lift.set(0);
+   }
 
    //flyWheel
-   if()}
-
+   if(xbox.getRawAxis(3)>0.25 && xbox.getRawAxis(2)<0.25);{}
+  fly.set(1);}
+  else if (xbox.getRawAxis(3)<0.25 && xbox.getRawAxis(2)>0.25){
+    fly.set(-1);}
+    else {
+      fly.set(0);}
+    //panal
+    if(xbox.getRawButton(5));{
+      gear.setAngle(180);}
+      else{gear.setAngle(0);
+      }
+      //pnew
+  //front
+  if (xbox.getRawButton(7) && xbox.getRawButton(4));{
+    frontS.set(true);}
+    else{
+      frontS.set(false);}
+  //back
+  if (xbox.getRawButton(6) && xbox.getRawButton(4));{
+    backS.set(true);}
+    else{
+      backS.set(false);
+    }
+  }
   /**
    * This function is called periodically during test mode.
    */
