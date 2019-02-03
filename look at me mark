@@ -8,19 +8,18 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.*;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import java.lang.Object;
-import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.SolenoidBase;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.IterativeRobot;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,38 +29,35 @@ import edu.wpi.first.wpilibj.SendableBase;
  * directory.
  */
 public class Robot extends TimedRobot {
+  WPI_TalonSRX rightFront_master = new WPI_TalonSRX(2); //assign TALON chain number
+  WPI_TalonSRX rightFront_slave  = new WPI_TalonSRX(4);
+  SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront_master, rightFront_slave);
 
-  Joystick joy = new Joystick(0);
-Joystick xbox = new Joystick(1);
-
-  //lower
-
-WPI_TalonSRX leftMaster = new WPI_TalonSRX(1);
-WPI_TalonSRX leftSlave = new WPI_TalonSRX(3);
-  SpeedControllerGroup rightGroup = new SpeedControllerGroup(leftMaster, leftSlave);
- //chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
+  WPI_TalonSRX leftFront_master = new WPI_TalonSRX(1);
+  WPI_TalonSRX leftFront_slave = new WPI_TalonSRX(3);
+  SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront_master, leftFront_slave);
   
 
-WPI_TalonSRX rightMaster = new WPI_TalonSRX(2);
-WPI_TalonSRX rightSlave = new WPI_TalonSRX(4);
-  SpeedControllerGroup leftGroup = new SpeedControllerGroup(leftMaster,leftSlave);
+  WPI_TalonSRX right_lift = new WPI_TalonSRX(5);
+  WPI_TalonSRX left_lift = new WPI_TalonSRX(6);
+  SpeedControllerGroup lift = new SpeedControllerGroup(left_lift, right_lift);
+  //DifferentialDrive m_lift = new DifferentialDrive(lift);
+   
+  Servo servo_1 = new Servo(1);
+  Spark fly_wheels = new Spark(2);
+  
+  Solenoid front_solenoid = new Solenoid(0);
+  Solenoid back_solenoid = new Solenoid(1);
+    
 
-DifferentialDrive lower = new DifferentialDrive(leftGroup,rightGroup);
-lower.setInvertedMotor(RobotDrive.leftGroup, true);
+    DifferentialDrive m_robotDrive = new DifferentialDrive(m_right , m_left );
 
-//upper
+    Joystick m_stick = new Joystick(0);
+    Joystick xbox = new Joystick(1);
+//fly wheel deadband num
+double deadband = 0.25;
 
-Servo gear = new Servo(1);
-
-Sparx fly = new Sparx(2);
-
-WPI_TalonSRX leftLift = new WPI_TalonSRX(5);
-WPI_TalonSRX rightLift = new WPI_TalonSRX(6);
-SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
-    //pnew
-    Solenoid frontS = new Solenoid(0);
-    Solenoid backS = new Solenoid(1);
-  private final Timer m_timer = new Timer();
+    Timer m_timer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -69,8 +65,12 @@ SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
    */
   @Override
   public void robotInit() {
+  //  leftFront_slave.follow(leftFront_master);
+	//	rightFront_slave.follow(rightFront_master);
+  CameraServer.getInstance().startAutomaticCapture();
+  CameraServer.getInstance().startAutomaticCapture();
   }
-
+    
   /**
    * This function is run once each time the robot enters autonomous mode.
    */
@@ -86,11 +86,8 @@ SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
   @Override
   public void autonomousPeriodic() {
     // Drive for 2 seconds
-    if (m_timer.get() < 2.0) {
-      m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-    } else {
-      m_robotDrive.stopMotor(); // stop robot
-    }
+    
+    
   }
 
   /**
@@ -105,61 +102,92 @@ SpeedControllerGroup lift = new SpeedControllerGroup(leftLift,rightLift);
    */
   @Override
   public void teleopPeriodic() {
-   //lower
-   //lower.arcadeDrive(joy.getY(),joy.getX());
 
-   if(xbox.getRawButton(0))
-    {
-     lower.arcadeDrive(Joy.getY()*0.5,joy.getX();
-    }
-    else
-    {
-      lower.arcadeDrive(joy.getY(),joy.getX());
-    }
-   //upper
+      //Xbox input variables   
+      double x_left_trigger, x_right_trigger; // triggers on xbox
+      boolean x_right_bumper, x_left_bumper;
+      boolean x_back_button, x_start_button;
+      double x_leftY;
+      
+
+      //Joystick input variables
+      double j_Axis0, j_Axis1;  //joystick axes
+      boolean j_trigger; //index finger trigger
+     
+
    
-   //lift
-   if(xbox.getRawAxis(1)>0.25)
-   {
+    //Get all all the inputs from js and xbox
+    
+    //Joystick
+    j_Axis1 =   (m_stick.getRawAxis(1));
+    j_Axis0 =   (m_stick.getRawAxis(0));
+    j_trigger = (m_stick.getRawButton(1));
+    
+    //Xbox
+    x_leftY = xbox.getRawAxis(1);
+    x_left_trigger  = xbox.getRawAxis(2);
+    x_right_trigger = xbox.getRawAxis(3);
+    x_right_bumper  = xbox.getRawButton(6);
+    x_left_bumper   = xbox.getRawButton(5);
+    x_back_button = (xbox.getRawButton(7));
+    x_start_button = (xbox.getRawButton(8));
+    //Speed control (if button is not pressed then speed is slower)
+  
+    if (j_trigger == true) {
+          m_robotDrive.arcadeDrive(j_Axis1  , j_Axis0 );
+        }else{  
+          m_robotDrive.arcadeDrive(j_Axis1 * 0.5 , j_Axis0 );
+        }
+     
+
+   //Utilizes trigger output to set fly wheel direction
+   //if right is pressed and left is not, that fw is max.
+   if (x_right_trigger > deadband && x_left_trigger < deadband){
+        fly_wheels.set(1.0);  //setting speed to max.
+    }else {
+      //if left is pressed and right is not, then fw is -max
+      if (x_right_trigger < deadband && x_left_trigger > deadband){
+          fly_wheels.set(-1);
+      //otherwise, no action on fw.
+      }else{
+        fly_wheels.set(0);
+      }
+    }
+    //Panel
+    //Uses right bumper to set Servo position
+    if(x_right_bumper){
+      servo_1.setAngle(180);
+    }else{ 
+      servo_1.setAngle(0);
+    }  
+ 
+  //front solenoid to control pneumatic
+  if (x_start_button == true && x_left_bumper == true){
+    front_solenoid.set(true);
+  }else{
+    front_solenoid.set(false);
+  }
+  //back solenoid
+  if (x_back_button == true && x_left_bumper == true){
+      back_solenoid.set(true);
+    }else{
+      back_solenoid.set(false);
+    }
+
+  //lift
+   if(x_leftY > deadband){
      lift.set(-1);
-   }
-   else if(xbox.getRawAxis(1)< -0.25)
-   {
+   }else if(x_leftY < -0.25){
      lift.set(1);
-   }
-   else
-   {
+   }else{
      lift.set(0);
    }
-
-   //flyWheel
-   if(xbox.getRawAxis(3)>0.25 && xbox.getRawAxis(2)<0.25);{}
-  fly.set(1);}
-  else if (xbox.getRawAxis(3)<0.25 && xbox.getRawAxis(2)>0.25){
-    fly.set(-1);}
-    else {
-      fly.set(0);}
-    //panal
-    if(xbox.getRawButton(5));{
-      gear.setAngle(180);}
-      else{gear.setAngle(0);
-      }
-      //pnew
-  //front
-  if (xbox.getRawButton(7) && xbox.getRawButton(4));{
-    frontS.set(true);}
-    else{
-      frontS.set(false);}
-  //back
-  if (xbox.getRawButton(6) && xbox.getRawButton(4));{
-    backS.set(true);}
-    else{
-      backS.set(false);
-    }
+   
   }
-  /**
-   * This function is called periodically during test mode.
-   */
+
+  
+   // This function is called periodically during test mode.
+   
   @Override
   public void testPeriodic() {
   }
