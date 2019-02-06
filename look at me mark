@@ -191,9 +191,9 @@ double deadband = 0.25;
      liftLeft.set(0);
    }
    if(x_leftY > deadband){
-    rightLift.set(1);
-  }else if(x_leftY < -0.25){
     rightLift.set(-1);
+  }else if(x_leftY < -0.25){
+    rightLift.set(1);
   }else{
     rightLift.set(0);
     }
