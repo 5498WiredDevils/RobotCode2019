@@ -71,6 +71,7 @@ public class Robot extends TimedRobot {
   CameraServer.getInstance().startAutomaticCapture();
   CameraServer.getInstance().startAutomaticCapture();
    right_lift.getInverted();
+   left_lift.getInverted();
    
   }
     
