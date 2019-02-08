@@ -40,12 +40,14 @@ public class Robot extends TimedRobot {
 
   WPI_TalonSRX left_liftMaster = new WPI_TalonSRX(5);
   WPI_TalonSRX left_liftSlave = new WPI_TalonSRX(7);
-  SpeedControllerGroup liftLeft = new SpeedControllerGroup(left_liftSlave, left_liftMaster);
+  //SpeedControllerGroup liftLeft = new SpeedControllerGroup(left_liftSlave, left_liftMaster);
 
   WPI_TalonSRX right_liftMaster = new WPI_TalonSRX(6);
+ 
   WPI_TalonSRX right_liftSlave = new WPI_TalonSRX(8);
-  SpeedControllerGroup rightLift = new SpeedControllerGroup(right_liftMaster, right_liftSlave);
-  //DifferentialDrive m_lift = new DifferentialDrive(lift);
+
+  //SpeedControllerGroup rightLift = new SpeedControllerGroup(right_liftMaster, right_liftSlave);
+ SpeedControllerGroup lift = new SpeedControllerGroup( left_liftMaster, left_liftSlave, right_liftMaster, right_liftSlave);
 
   // tilter 
   WPI_TalonSRX tilt = new WPI_TalonSRX(10);
@@ -186,27 +188,29 @@ double deadband = 0.25;
 
   //lift
    if(x_leftY > deadband){
-     liftLeft.set(-1);
+     lift.set(-1);
    }else if(x_leftY < -0.25){
-     liftLeft.set(1);
+     lift.set(1);
    }else{
-     liftLeft.set(0);
+     lift.set(0);
    }
+   /*
    if(x_leftY > deadband){
-    rightLift.set(1);
+    lift.set(1);
   }else if(x_leftY < -0.25){
-    rightLift.set(-1);
+    lift.set(-1);
   }else{
-    rightLift.set(0);
+    lift.set(0);
     }
-    //tilt
+  */  //tilt
     if(x_aButton == true && x_bButton == false){
       tilt.set(1);
     }else if(x_aButton == false && x_bButton == true){
       tilt.set(-1);
       }
       else{
-        tilt.set(0);}
+     
+       tilt.set(0);}
 
 
   }
