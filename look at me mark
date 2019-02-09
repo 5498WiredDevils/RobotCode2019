@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
-
+import edu.wpi.first.wpilibj.AnalogInput;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -40,15 +40,13 @@ public class Robot extends TimedRobot {
 
   WPI_TalonSRX left_liftMaster = new WPI_TalonSRX(5);
   WPI_TalonSRX left_liftSlave = new WPI_TalonSRX(7);
-  //SpeedControllerGroup liftLeft = new SpeedControllerGroup(left_liftSlave, left_liftMaster);
+  SpeedControllerGroup leftLift = new SpeedControllerGroup(left_liftSlave, left_liftMaster);
 
   WPI_TalonSRX right_liftMaster = new WPI_TalonSRX(6);
- 
   WPI_TalonSRX right_liftSlave = new WPI_TalonSRX(8);
-
-  //SpeedControllerGroup rightLift = new SpeedControllerGroup(right_liftMaster, right_liftSlave);
- SpeedControllerGroup lift = new SpeedControllerGroup( left_liftMaster, left_liftSlave, right_liftMaster, right_liftSlave);
-
+  SpeedControllerGroup rightLift = new SpeedControllerGroup(right_liftMaster, right_liftSlave);
+  DifferentialDrive lift = new DifferentialDrive(rightLift,leftLift);
+ //SpeedControllerGroup lift;
   // tilter 
   WPI_TalonSRX tilt = new WPI_TalonSRX(10);
    
@@ -66,7 +64,8 @@ public class Robot extends TimedRobot {
     Joystick xbox = new Joystick(1);
 //fly wheel deadband num
 double deadband = 0.25;
-
+//sonic sensors.
+AnalogInput ai = new AnalogInput(0);
     Timer m_timer = new Timer();
 
   /**
@@ -80,8 +79,11 @@ double deadband = 0.25;
   CameraServer.getInstance().startAutomaticCapture();
   CameraServer.getInstance().startAutomaticCapture();
   
-  right_liftMaster.setInverted(true);
-  right_liftSlave.setInverted(true);
+ // set.right_liftMaster.Inverted(true);
+ // right_liftSlave.setInverted(true);
+
+ //lift = new SpeedControllerGroup( left_liftMaster, left_liftSlave, right_liftMaster, right_liftSlave);
+
   //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.right_liftMaster, true);
   //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.left_liftSlave, true);
 
@@ -103,7 +105,7 @@ double deadband = 0.25;
   public void autonomousPeriodic() {
     // Drive for 2 seconds
     
-    
+    actTell();
   }
 
   /**
@@ -111,6 +113,7 @@ double deadband = 0.25;
    */
   @Override
   public void teleopInit() {
+    
   }
 
   /**
@@ -118,7 +121,18 @@ double deadband = 0.25;
    */
   @Override
   public void teleopPeriodic() {
+    actTell();
+     
+  }
 
+  
+   // This function is called periodically during test mode.
+   
+  @Override
+  public void testPeriodic() {
+  }
+
+  public void actTell() {
       //Xbox input variables   
       double x_left_trigger, x_right_trigger; // triggers on xbox
       boolean x_right_bumper, x_left_bumper;
@@ -130,7 +144,10 @@ double deadband = 0.25;
       double j_Axis0, j_Axis1;  //joystick axes
       boolean j_trigger; //index finger trigger
      
-
+    //for sonic distance 
+    int sonic_0;
+    sonic_0 = ai.getValue();
+    System.out.println(sonic_0);
    
     //Get all all the inputs from js and xbox
     
@@ -149,6 +166,7 @@ double deadband = 0.25;
     x_start_button = (xbox.getRawButton(8));
     x_aButton = (xbox.getRawButton(1));
     x_bButton = (xbox.getRawButton(2));
+    
     //Speed control (if button is not pressed then speed is slower)
   
     if (j_trigger == true) {
@@ -194,11 +212,11 @@ double deadband = 0.25;
 
   //lift
    if(x_leftY > deadband){
-     lift.set(-1);
+     lift.arcadeDrive(1,0);
    }else if(x_leftY < -0.25){
-     lift.set(1);
+     lift.arcadeDrive(-1,0);
    }else{
-     lift.set(0);
+     lift.arcadeDrive(0,0);
    }
    /*
    if(x_leftY > deadband){
@@ -216,15 +234,8 @@ double deadband = 0.25;
       }
       else{
      
-       tilt.set(0);}
-
-
-  }
-
-  
-   // This function is called periodically during test mode.
-   
-  @Override
-  public void testPeriodic() {
+       tilt.set(0);
+      }
+       
   }
 }
