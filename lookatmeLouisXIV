@@ -70,9 +70,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {
   CameraServer.getInstance().startAutomaticCapture();
   CameraServer.getInstance().startAutomaticCapture();
-   right_lift.getInverted();
-   left_lift.getInverted();
-   
+ //  right_lift.getInverted();
+  // left_lift.getInverted();
+//   lift.setInvertedMotor(Timed.TalonSRX.frontType, false);
   }
     
   /**
