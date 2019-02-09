@@ -79,6 +79,12 @@ double deadband = 0.25;
 	//	rightFront_slave.follow(rightFront_master);
   CameraServer.getInstance().startAutomaticCapture();
   CameraServer.getInstance().startAutomaticCapture();
+  
+  right_liftMaster.setInverted(true);
+  right_liftSlave.setInverted(true);
+  //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.right_liftMaster, true);
+  //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.left_liftSlave, true);
+
   }
     
   /**
@@ -148,7 +154,7 @@ double deadband = 0.25;
     if (j_trigger == true) {
           m_robotDrive.arcadeDrive(j_Axis1  , j_Axis0 );
         }else{  
-          m_robotDrive.arcadeDrive(j_Axis1 * 0.5 , j_Axis0 );
+          m_robotDrive.arcadeDrive(j_Axis1 * 0.5 , j_Axis0 * 0.5 );
         }
      
 
