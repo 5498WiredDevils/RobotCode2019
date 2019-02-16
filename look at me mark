@@ -69,6 +69,8 @@ public class Robot extends TimedRobot {
   AnalogInput ai = new AnalogInput(0);
   DigitalOutput di = new DigitalOutput(0);
     Timer m_timer = new Timer();
+ 
+  CameraServer RazServer_0 = CameraServer.getInstance();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -76,18 +78,19 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-  //  leftFront_slave.follow(leftFront_master);
-	//	rightFront_slave.follow(rightFront_master);
-  CameraServer.getInstance().startAutomaticCapture();
-  CameraServer.getInstance().startAutomaticCapture();
   
- // set.right_liftMaster.Inverted(true);
- // right_liftSlave.setInverted(true);
+  //CameraServer.getInstance().startAutomaticCapture();
 
- //lift = new SpeedControllerGroup( left_liftMaster, left_liftSlave, right_liftMaster, right_liftSlave);
 
-  //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.right_liftMaster, true);
-  //lift.setInvertedMotor(SpeedControllerGroup.WPI_TalonSRX.left_liftSlave, true);
+  RazServer_0.addAxisCamera("Raz_0","10.54.98.2:1735");
+  RazServer_0.startAutomaticCapture();
+ //UsbCamera RazCam_0 = new UsbCamera("RazCam_0", 0);
+// CvSink cvSink = new CvSink("opencv_USB RazCam_0");
+ //cvSink.setSource(usbCamera);
+
+
+
+ //MjpegServer mjpegServer1 = new MjpegServer("Raz_0", 1735);
 
   }
     
@@ -220,21 +223,19 @@ public class Robot extends TimedRobot {
     }
 
   //lift
-   if(x_leftY > deadband){
+   if(x_leftY > deadband && !(x_right_bumper)) {
      lift.arcadeDrive(1,0);
-   }else if(x_leftY < -0.25){
+   }else if(x_leftY < -0.25 && !(x_right_bumper)){
      lift.arcadeDrive(-1,0);
    }else{
-     lift.arcadeDrive(0,0);
-   }
-   if(x_leftY > deadband && x_right_bumper == true){
+     if(x_leftY > deadband && x_right_bumper){
     lift.arcadeDrive(0.5,0);
-  }else if(x_leftY < -0.25 && x_right_bumper == true){
+  }else if(x_leftY < -0.25 && x_right_bumper){
     lift.arcadeDrive(-0.5,0);
   }else{
     lift.arcadeDrive(0,0);
+    }
   }
-   
    //tilt
     if(x_aButton == true && x_bButton == false){
       tilt.set(1);
