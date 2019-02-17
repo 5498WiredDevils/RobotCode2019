@@ -238,9 +238,9 @@ public class Robot extends TimedRobot {
   }
    //tilt
     if(x_aButton == true && x_bButton == false){
-      tilt.set(1);
+      tilt.set(0.5);
     }else if(x_aButton == false && x_bButton == true){
-      tilt.set(-1);
+      tilt.set(-0.5);
       }
       else{
      
