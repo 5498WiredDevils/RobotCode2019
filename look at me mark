@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
   DigitalOutput di = new DigitalOutput(0);
     Timer m_timer = new Timer();
  
-  CameraServer RazServer_0 = CameraServer.getInstance();
+  //CameraServer RazServer_0 = CameraServer.getInstance();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -78,19 +78,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-  
+  //backup for usb cam
+  //CameraServer.getInstance().startAutomaticCapture();
+ // CameraServer.getInstance().startAutomaticCapture();
   //CameraServer.getInstance().startAutomaticCapture();
 
 
-  RazServer_0.addAxisCamera("Raz_0","10.54.98.2:1735");
-  RazServer_0.startAutomaticCapture();
- //UsbCamera RazCam_0 = new UsbCamera("RazCam_0", 0);
-// CvSink cvSink = new CvSink("opencv_USB RazCam_0");
- //cvSink.setSource(usbCamera);
 
-
-
- //MjpegServer mjpegServer1 = new MjpegServer("Raz_0", 1735);
 
   }
     
@@ -238,9 +232,9 @@ public class Robot extends TimedRobot {
   }
    //tilt
     if(x_aButton == true && x_bButton == false){
-      tilt.set(0.5);
+      tilt.set(0.15);
     }else if(x_aButton == false && x_bButton == true){
-      tilt.set(-0.5);
+      tilt.set(-0.15);
       }
       else{
      
