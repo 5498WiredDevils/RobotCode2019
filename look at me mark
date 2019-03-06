@@ -16,12 +16,16 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.SendableBase;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -30,47 +34,45 @@ import edu.wpi.first.wpilibj.DigitalOutput;
  * directory.
  */
 public class Robot extends TimedRobot {
+  //right drive
   WPI_TalonSRX rightFront_master = new WPI_TalonSRX(2); //assign TALON chain number
   WPI_TalonSRX rightFront_slave  = new WPI_TalonSRX(4);
   SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront_master, rightFront_slave);
-
+  //left drive
   WPI_TalonSRX leftFront_master = new WPI_TalonSRX(1);
   WPI_TalonSRX leftFront_slave = new WPI_TalonSRX(3);
   SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront_master, leftFront_slave);
-  
-
-  WPI_TalonSRX left_liftMaster = new WPI_TalonSRX(5);
-  WPI_TalonSRX left_liftSlave = new WPI_TalonSRX(7);
-  SpeedControllerGroup leftLift = new SpeedControllerGroup(left_liftSlave, left_liftMaster);
-
-  WPI_TalonSRX right_liftMaster = new WPI_TalonSRX(6);
-  WPI_TalonSRX right_liftSlave = new WPI_TalonSRX(8);
-  SpeedControllerGroup rightLift = new SpeedControllerGroup(right_liftMaster, right_liftSlave);
-  DifferentialDrive lift = new DifferentialDrive(rightLift,leftLift);
- //SpeedControllerGroup lift;
+    DifferentialDrive m_robotDrive = new DifferentialDrive(m_right , m_left );
+  //lift
+  WPI_TalonSRX leftLift = new WPI_TalonSRX(5);
+  WPI_TalonSRX rightLiftD = new WPI_TalonSRX(6);
+ 
+ 
   // tilter 
   WPI_TalonSRX tilt = new WPI_TalonSRX(10);
    
-  Servo servo_1 = new Servo(1);
+  //ball catcher
   WPI_TalonSRX fly_wheels = new WPI_TalonSRX(9);
-  
+  //lifting robot
   Solenoid front_solenoid = new Solenoid(0);
   Solenoid back_solenoid = new Solenoid(1);
+ //backup fourbar
+  Solenoid lift1 = new Solenoid(2);
+  Solenoid lift2 = new Solenoid(3);
 
-    
-
-    DifferentialDrive m_robotDrive = new DifferentialDrive(m_right , m_left );
-
-    Joystick m_stick = new Joystick(0);
-    Joystick xbox = new Joystick(1);
-//fly wheel deadband num
+  Compressor c = new Compressor(0);
+    // joysticks
+  Joystick m_stick = new Joystick(0);
+  Joystick xbox = new Joystick(1);
+// deadband num
   double deadband = 0.25;
-//sonic sensors.
-  AnalogInput ai = new AnalogInput(0);
-  DigitalOutput di = new DigitalOutput(0);
-    Timer m_timer = new Timer();
+
+  AnalogPotentiometer RightPonte = new AnalogPotentiometer(0,3600,360);
+  AnalogPotentiometer LeftPonte = new AnalogPotentiometer(1,3600,360);
+
+  Timer m_timer = new Timer();
  
-  //CameraServer RazServer_0 = CameraServer.getInstance();
+ Servo gate = new Servo(0);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -78,13 +80,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-  //backup for usb cam
-  //CameraServer.getInstance().startAutomaticCapture();
- // CameraServer.getInstance().startAutomaticCapture();
-  //CameraServer.getInstance().startAutomaticCapture();
-
-
-
+        //  c.setClosedLoopControl(true);
 
   }
     
@@ -134,22 +130,17 @@ public class Robot extends TimedRobot {
   public void actTell() {
       //Xbox input variables   
       double x_left_trigger, x_right_trigger; // triggers on xbox
-      boolean x_right_bumper, x_left_bumper;
-      boolean x_back_button, x_start_button;
       double x_leftY;
+      boolean x_right_bumper, x_left_bumper; // bumper on xbox
+      boolean x_back_button, x_start_button;
+      boolean x_Xbutton, x_Ybutton;
+     
       boolean x_aButton, x_bButton;
 
       //Joystick input variables
       double j_Axis0, j_Axis1;  //joystick axes
       boolean j_trigger; //index finger trigger
      
-    //for sonic distance 
-    int sonic_0;
-    sonic_0 = ai.getValue();
-    sonic_0 = sonic_0 / 2;
-    System.out.print(sonic_0);System.out.println("-------------------------------");
-    System.out.println("  _ _ _ _ _ _ _ ");
-   
    
     //Get all all the inputs from js and xbox
     
@@ -168,20 +159,44 @@ public class Robot extends TimedRobot {
     x_start_button = (xbox.getRawButton(8));
     x_aButton = (xbox.getRawButton(1));
     x_bButton = (xbox.getRawButton(2));
-    //test light
-     if (x_right_bumper == true ){
-      di.set(true);
-     }else{
-       di.set(false);}
-    //Speed control (if button is not pressed then speed is slower)
-  
-    if (j_trigger == true) {
-          m_robotDrive.arcadeDrive(j_Axis1  , j_Axis0 );
-        }else{  
-          m_robotDrive.arcadeDrive(j_Axis1 * 0.5 , j_Axis0 * 0.5 );
-        }
-     
+    x_Xbutton = (xbox.getRawButton(3));
+    x_Ybutton = (xbox.getRawButton(4));
 
+    int jPOV , xPOV;
+
+    jPOV = m_stick.getPOV();
+    xPOV = xbox.getPOV();
+
+    double rightP , leftP;
+    double liftDIF;
+    rightP = RightPonte.get();
+    leftP = LeftPonte.get();
+
+    liftDIF = rightP - leftP;
+    //Speed control (if button is not pressed then speed is slower)
+    if(jPOV == 90){
+      if(j_trigger == true){
+      m_right.set(j_Axis1);
+    }else{  
+      m_right.set(j_Axis1 * 0.75);
+  }
+}else if(jPOV == 270){
+    if(j_trigger == true){
+      m_left.set(j_Axis1);
+    }else{  
+      m_left.set(j_Axis1 * 0.75);
+    }
+  }else{
+    if (j_trigger == true) {
+      m_robotDrive.arcadeDrive(j_Axis1  , j_Axis0 );
+    }else{  
+      m_robotDrive.arcadeDrive(j_Axis1 * 0.75 , j_Axis0 * 0.75 );
+      }
+    }
+  
+    
+
+     
    //Utilizes trigger output to set fly wheel direction
    //if right is pressed and left is not, that fw is max.
    if (x_right_trigger > deadband && x_left_trigger < deadband){
@@ -195,13 +210,7 @@ public class Robot extends TimedRobot {
         fly_wheels.set(0);
       }
     }
-    //Panel
-    //Uses right bumper to set Servo position
-    if(x_right_bumper){
-      servo_1.setAngle(180);
-    }else{ 
-      servo_1.setAngle(0);
-    }  
+    
  
   //front solenoid to control pneumatic
   if (x_start_button == true && x_left_bumper == true){
@@ -212,34 +221,62 @@ public class Robot extends TimedRobot {
   //back solenoid to control pneumatic
   if (x_back_button == true && x_left_bumper == true){
       back_solenoid.set(true);
-    }else{
+  }else{
       back_solenoid.set(false);
+  }
+  double low = 0.0;
+  double fast = 0.48;
+  double slow = 0.26;
+  //fast .6 slow .35
+  double fastDown = 0.25;
+  double slowDown = 0.15;
+  //lift
+  if(x_leftY >= 0.5 && !(x_right_bumper)) {
+    rightLiftD.set(-fastDown + low);
+    leftLift.set(-fastDown + liftDIF);
+  }
+  else if(x_leftY <= -0.5 && !(x_right_bumper)){
+    rightLiftD.set(fast);
+    leftLift.set(fast + liftDIF);
+  }
+  else{if(x_leftY >= 0.25 && !(x_right_bumper)){
+    rightLiftD.set(-slowDown );
+    leftLift.set(-slowDown + liftDIF);
+  }
+    else if(x_leftY <= -0.25 && !(x_right_bumper)){
+    rightLiftD.set(slow );
+    leftLift.set(slow + liftDIF);
+  }
+    else {if(x_leftY > deadband && x_right_bumper){
+      rightLiftD.set(-slowDown);
+      leftLift.set(-slowDown + liftDIF);
+    }
+    else if(x_leftY < -0.25 && x_right_bumper){
+      rightLiftD.set(slow );
+      leftLift.set(slow + liftDIF);
+    }
+    else{
+      rightLiftD.set(0);
+      leftLift.set(0 + liftDIF);
+        }
+      }
     }
 
-  //lift
-   if(x_leftY > deadband && !(x_right_bumper)) {
-     lift.arcadeDrive(1,0);
-   }else if(x_leftY < -0.25 && !(x_right_bumper)){
-     lift.arcadeDrive(-1,0);
-   }else{
-     if(x_leftY > deadband && x_right_bumper){
-    lift.arcadeDrive(0.5,0);
-  }else if(x_leftY < -0.25 && x_right_bumper){
-    lift.arcadeDrive(-0.5,0);
-  }else{
-    lift.arcadeDrive(0,0);
-    }
-  }
    //tilt
     if(x_aButton == true && x_bButton == false){
-      tilt.set(0.15);
+      tilt.set(0.75);
     }else if(x_aButton == false && x_bButton == true){
-      tilt.set(-0.15);
-      }
-      else{
-     
+      tilt.set(-0.25);
+    }else{
        tilt.set(0);
-      }
-       
+    }
+    //gate
+    
+    if(x_Ybutton && !(x_Xbutton)){
+        gate.setAngle(90);
+       }else if(!(x_Ybutton) && (x_Xbutton)){
+        gate.setAngle(0);
+       }else{}
+
   }
 }
