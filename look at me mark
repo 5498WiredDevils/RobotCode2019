@@ -384,7 +384,8 @@ else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
     leftLift.set(0 + liftDIF);
       }
     }
-  }}
+  }
+}
 
    //tilt
     if(x_aButton == true && x_bButton == false){
