@@ -319,41 +319,42 @@ public class Robot extends TimedRobot {
      }while (rightP < Ball3 && x_leftY < deadband && x_leftY > -deadband);
    }
    //up hatch
-   if (rightP < Hatch1 && xPOV == 90){
+   if (rightP < Hatch1 && xPOV == 0){
     do {
     rightLiftD.set(fast);
     leftLift.set(fast + liftDIF);
       } while (rightP < Hatch1 && x_leftY < deadband && x_leftY > -deadband);
    }
-   else if (rightP < Hatch2 && rightP >= Hatch1 && xPOV == 90){
+   else if (rightP < Hatch2 && rightP >= Hatch1 && xPOV == 0){
    do {
     rightLiftD.set(fast);
     leftLift.set(fast + liftDIF);
   } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
-  }else if(rightP < Hatch3 && rightP >= Hatch2 && xPOV == 90){
+  }else if(rightP < Hatch3 && rightP >= Hatch2 && xPOV == 0){
   do {
     rightLiftD.set(fast);
     leftLift.set(fast + liftDIF);
   } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
  }
 
-else if (rightP > Hatch1 && rightP <= Hatch2 && xPOV == 270){
+else if (rightP > Hatch1 && rightP <= Hatch2 && xPOV == 180){
   do {
     rightLiftD.set(-fastDown);
     leftLift.set(-fastDown + liftDIF);
    }while (rightP > Hatch1 && x_leftY < deadband && x_leftY > -deadband);
    //3-2
- }else if (rightP > Hatch2 && rightP <= Hatch3 && xPOV == 270) { 
+ }else if (rightP > Hatch2 && rightP <= Hatch3 && xPOV == 180) { 
   do {
     rightLiftD.set(-fastDown);
     leftLift.set(-fastDown + liftDIF);
    }while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
- }else if (rightP > Hatch3 && xPOV == 270) { 
+ }else if (rightP > Hatch3 && xPOV == 180) { 
   do {
     rightLiftD.set(-fastDown);
     leftLift.set(-fastDown + liftDIF);
    }while (rightP < Hatch3 && x_leftY < deadband && x_leftY > -deadband);
  }else{
+   
    if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
   rightLiftD.set(-fastDown );
   leftLift.set(-fastDown + liftDIF);
