@@ -167,12 +167,7 @@ public class Robot extends TimedRobot {
     jPOV = m_stick.getPOV();
     xPOV = xbox.getPOV();
 
-    double rightP , leftP;
-    double liftDIF;
-    rightP = RightPonte.get();
-    leftP = LeftPonte.get();
-
-    liftDIF = rightP - leftP;
+    
     //Speed control (if button is not pressed then speed is slower)
     if(jPOV == 90){
       if(j_trigger == true){
@@ -182,9 +177,9 @@ public class Robot extends TimedRobot {
   }
 }else if(jPOV == 270){
     if(j_trigger == true){
-      m_left.set(j_Axis1);
+      m_left.set(-j_Axis1);
     }else{  
-      m_left.set(j_Axis1 * 0.75);
+      m_left.set(-j_Axis1 * 0.75);
     }
   }else{
     if (j_trigger == true) {
@@ -231,36 +226,59 @@ public class Robot extends TimedRobot {
   double fastDown = 0.25;
   double slowDown = 0.15;
   //lift
-  if(x_leftY >= 0.5 && !(x_right_bumper)) {
-    rightLiftD.set(-fastDown + low);
-    leftLift.set(-fastDown + liftDIF);
+  double rightP , leftP;
+  double liftDIF;
+  double MAX , MIN;
+    rightP = RightPonte.get();
+    leftP = LeftPonte.get();
+    MAX =3000.0; 
+    //3000.0;
+    MIN = 500.0;
+    //2000.0;
+    liftDIF = (rightP - leftP) / leftP;
+   
+
+
+  if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
+    rightLiftD.set(-fastDown );
+    leftLift.set(-fastDown + liftDIF*/);
   }
-  else if(x_leftY <= -0.5 && !(x_right_bumper)){
+  else if(x_leftY <= -0.5 && !(x_right_bumper) && rightP < MAX  ){
     rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
+    leftLift.set(fast + liftDIF*/);
   }
-  else{if(x_leftY >= 0.25 && !(x_right_bumper)){
+  else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
     rightLiftD.set(-slowDown );
-    leftLift.set(-slowDown + liftDIF);
+    leftLift.set(-slowDown + liftDIF*/);
   }
-    else if(x_leftY <= -0.25 && !(x_right_bumper)){
+    else if(x_leftY <= -0.25 && !(x_right_bumper) && rightP < MAX){
     rightLiftD.set(slow );
-    leftLift.set(slow + liftDIF);
+    leftLift.set(slow + liftDIF*/);
   }
-    else {if(x_leftY > deadband && x_right_bumper){
+    else {if(x_leftY > deadband && x_right_bumper && rightP > MIN){
       rightLiftD.set(-slowDown);
-      leftLift.set(-slowDown + liftDIF);
+      leftLift.set(-slowDown + liftDIF*/);
     }
-    else if(x_leftY < -0.25 && x_right_bumper){
+    else if(x_leftY < -0.25 && x_right_bumper  && rightP < MAX){
       rightLiftD.set(slow );
-      leftLift.set(slow + liftDIF);
+      leftLift.set(slow + liftDIF*/);
     }
     else{
       rightLiftD.set(0);
-      leftLift.set(0 + liftDIF);
+      leftLift.set(0 + liftDIF*/);
         }
       }
     }
+
+   double Ball1 , Ball2 , Ball3;
+   double Hatch1, Hatch2 , Hatch3;
+    // leftP
+    // rightP
+   if (rightP < ball1 && xPOV == 90){
+     
+   }
+
+
 
    //tilt
     if(x_aButton == true && x_bButton == false){
