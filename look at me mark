@@ -50,15 +50,15 @@ public class Robot extends TimedRobot {
  
   // tilter 
   WPI_TalonSRX tilt = new WPI_TalonSRX(10);
-   
+  Spark tiltin = new Spark(1);
   //ball catcher
   WPI_TalonSRX fly_wheels = new WPI_TalonSRX(9);
   //lifting robot
   Solenoid front_solenoid = new Solenoid(0);
   Solenoid back_solenoid = new Solenoid(1);
  //backup fourbar
-  Solenoid lift1 = new Solenoid(2);
-  Solenoid lift2 = new Solenoid(3);
+  Solenoid back2 = new Solenoid(2);
+ 
 
   Compressor c = new Compressor(0);
     // joysticks
@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
 
   Timer m_timer = new Timer();
  
- Servo gate = new Servo(0);
+ //Servo gate = new Servo(0);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -185,13 +185,10 @@ public class Robot extends TimedRobot {
     if (j_trigger == true) {
       m_robotDrive.arcadeDrive(j_Axis1  , j_Axis0 );
     }else{  
-      m_robotDrive.arcadeDrive(j_Axis1 * 0.75 , j_Axis0 * 0.75 );
+      m_robotDrive.arcadeDrive(j_Axis1 * 0.75 , j_Axis0 * 0.65 );
       }
     }
   
-    
-
-     
    //Utilizes trigger output to set fly wheel direction
    //if right is pressed and left is not, that fw is max.
    if (x_right_trigger > deadband && x_left_trigger < deadband){
@@ -216,8 +213,10 @@ public class Robot extends TimedRobot {
   //back solenoid to control pneumatic
   if (x_back_button == true && x_left_bumper == true){
       back_solenoid.set(true);
+      back2.set(true);
   }else{
       back_solenoid.set(false);
+      back2.set(false);
   }
   double low = 0.0;
   double fast = 0.48;
@@ -225,56 +224,88 @@ public class Robot extends TimedRobot {
   //fast .6 slow .35
   double fastDown = 0.25;
   double slowDown = 0.15;
+  
+  double slow2 = 0.58;
+  double slowDown2 = .30;
   //lift
   double rightP , leftP;
   double liftDIF;
   double MAX , MIN;
+  double minll ; 
     rightP = RightPonte.get();
     leftP = LeftPonte.get();
-    MAX =3000.0; 
+    MAX =3375.0; 
     //3000.0;
-    MIN = 500.0;
+    MIN = 760.0;
+    minll = 760.0;
     //2000.0;
-    liftDIF = (rightP - leftP) / leftP;
+    liftDIF = 0;
+    //(rightP - leftP) / leftP;
    
+  
+    System.out.printf("leftP %.2f rightP %f \n ", leftP, rightP);
+   // System.out.println(rightP);
+  if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
+    rightLiftD.set(-fastDown - low );
+  }
+  else if(x_leftY <= -0.5 && !(x_right_bumper) && rightP < MAX  ){
+    rightLiftD.set(fast + low);
+  }
+  else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
+    rightLiftD.set(-slowDown );
+  }
+    else if(x_leftY <= -0.25 && !(x_right_bumper) && rightP < MAX){
+    rightLiftD.set(slow );
+  }
+    else {if(x_leftY > deadband && x_right_bumper && rightP > MIN){
+      rightLiftD.set(-slowDown2);
+    }
+    else if(x_leftY < -0.25 && x_right_bumper  && rightP < MAX){
+      rightLiftD.set(slow2 );
+    }
+    else{
+      rightLiftD.set(0);
+        }
+      }
+    }
+    /////////////////////////////////////////////////////////////////////
 
-
-  // if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
-  //   rightLiftD.set(-fastDown );
-  //   leftLift.set(-fastDown + liftDIF);
-  // }
-  // else if(x_leftY <= -0.5 && !(x_right_bumper) && rightP < MAX  ){
-  //   rightLiftD.set(fast);
-  //   leftLift.set(fast + liftDIF);
-  // }
-  // else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
-  //   rightLiftD.set(-slowDown );
-  //   leftLift.set(-slowDown + liftDIF);
-  // }
-  //   else if(x_leftY <= -0.25 && !(x_right_bumper) && rightP < MAX){
-  //   rightLiftD.set(slow );
-  //   leftLift.set(slow + liftDIF);
-  // }
-  //   else {if(x_leftY > deadband && x_right_bumper && rightP > MIN){
-  //     rightLiftD.set(-slowDown);
-  //     leftLift.set(-slowDown + liftDIF);
-  //   }
-  //   else if(x_leftY < -0.25 && x_right_bumper  && rightP < MAX){
-  //     rightLiftD.set(slow );
-  //     leftLift.set(slow + liftDIF);
-  //   }
-  //   else{
-  //     rightLiftD.set(0);
-  //     leftLift.set(0 + liftDIF);
-  //       }
-  //     }
-  //   }
+    if(x_leftY >= 0.5 && !(x_right_bumper) && leftP > minll) {
+     
+      leftLift.set(-fastDown );
+    }
+    else if(x_leftY <= -0.5 && !(x_right_bumper) && leftP < MAX  ){
+     
+      leftLift.set(fast );
+    }
+    else{if(x_leftY >= 0.25 && !(x_right_bumper) && leftP > minll){
+     
+      leftLift.set(-slowDown );
+    }
+      else if(x_leftY <= -0.25 && !(x_right_bumper) && leftP < MAX){
+    
+      leftLift.set(slow );
+    }
+      else {if(x_leftY > deadband && x_right_bumper && leftP > minll){
+       
+        leftLift.set(-slowDown2 );
+      }
+      else if(x_leftY < -0.25 && x_right_bumper  && leftP < MAX){
+      
+        leftLift.set(slow2 );
+      }
+      else{
+      
+        leftLift.set(0 );
+          }
+        }
+      }
 
    double Ball1 , Ball2 , Ball3;
    double Hatch1, Hatch2 , Hatch3;
-   Ball1 = 750;
-   Ball2 = 1500;
-   Ball3 = 2250;
+   Ball1 = 1500;
+   Ball2 = 2000;
+   Ball3 = 2500;
 
    Hatch1 = 250;
    Hatch2 = 1000;
@@ -283,109 +314,174 @@ public class Robot extends TimedRobot {
     // rightP
 
     // up with balls
-   if (rightP < Ball1 && xPOV == 90){
-    do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-      } while (rightP < Ball1 && x_leftY < deadband && x_leftY > -deadband);
-   }
-   else if (rightP < Ball2 && rightP >= Ball1 && xPOV == 90){
-   do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-  } while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
-  }else if(rightP < Ball3 && rightP >= Ball2 && xPOV == 90){
-  do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-  } while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+//    if (rightP < Ball1 && xPOV == 90){
+//     do {
+//     rightLiftD.set(fast);
+//     } while (rightP < Ball1 && (x_leftY < deadband && x_leftY > -deadband));
+//     rightLiftD.set(0);
+//    }
+//    else if (rightP < Ball2 && rightP >= Ball1 && xPOV == 90){
+//    do {
+//     rightLiftD.set(fast);
+//   } while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+//   }else if(rightP < Ball3 && rightP >= Ball2 && xPOV == 90){
+//   do {
+//     rightLiftD.set(fast);
+//   } while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
  
-  // down with balls
-  }else if (rightP > Ball1 && rightP <= Ball2 && xPOV == 270){
-    do {
-      rightLiftD.set(-fastDown);
-      leftLift.set(-fastDown + liftDIF);
-     }while (rightP > Ball1 && x_leftY < deadband && x_leftY > -deadband);
-     //3-2
-   }else if (rightP > Ball2 && rightP <= Ball3 && xPOV == 270) { 
-    do {
-      rightLiftD.set(-fastDown);
-      leftLift.set(-fastDown + liftDIF);
-     }while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
-   }else if (rightP > Ball3 && xPOV == 270) { 
-    do {
-      rightLiftD.set(-fastDown);
-      leftLift.set(-fastDown + liftDIF);
-     }while (rightP < Ball3 && x_leftY < deadband && x_leftY > -deadband);
-   }
-   //up hatch
-   if (rightP < Hatch1 && xPOV == 0){
-    do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-      } while (rightP < Hatch1 && x_leftY < deadband && x_leftY > -deadband);
-   }
-   else if (rightP < Hatch2 && rightP >= Hatch1 && xPOV == 0){
-   do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-  } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
-  }else if(rightP < Hatch3 && rightP >= Hatch2 && xPOV == 0){
-  do {
-    rightLiftD.set(fast);
-    leftLift.set(fast + liftDIF);
-  } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
- }
+//   // down with balls
+//   }else if (rightP > Ball1 && rightP <= Ball2 && xPOV == 270){
+//     do {
+//       rightLiftD.set(-fastDown);
+//      }while (rightP > Ball1 && x_leftY < deadband && x_leftY > -deadband);
+//      //3-2
+//    }else if (rightP > Ball2 && rightP <= Ball3 && xPOV == 270) { 
+//     do {
+//       rightLiftD.set(-fastDown);
+//      }while (rightP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+//    }else if (rightP > Ball3 && xPOV == 270) { 
+//     do {
+//       rightLiftD.set(-fastDown);
+//      }while (rightP < Ball3 && x_leftY < deadband && x_leftY > -deadband);
+//    }
+//    //up hatch
+//    if (rightP < Hatch1 && xPOV == 0){
+//     do {
+//     rightLiftD.set(fast);
+//       } while (rightP < Hatch1 && x_leftY < deadband && x_leftY > -deadband);
+//    }
+//    else if (rightP < Hatch2 && rightP >= Hatch1 && xPOV == 0){
+//    do {
+//     rightLiftD.set(fast);
+//   } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+//   }else if(rightP < Hatch3 && rightP >= Hatch2 && xPOV == 0){
+//   do {
+//     rightLiftD.set(fast);
+//   } while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+//  }
 
-else if (rightP > Hatch1 && rightP <= Hatch2 && xPOV == 180){
-  do {
-    rightLiftD.set(-fastDown);
-    leftLift.set(-fastDown + liftDIF);
-   }while (rightP > Hatch1 && x_leftY < deadband && x_leftY > -deadband);
-   //3-2
- }else if (rightP > Hatch2 && rightP <= Hatch3 && xPOV == 180) { 
-  do {
-    rightLiftD.set(-fastDown);
-    leftLift.set(-fastDown + liftDIF);
-   }while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
- }else if (rightP > Hatch3 && xPOV == 180) { 
-  do {
-    rightLiftD.set(-fastDown);
-    leftLift.set(-fastDown + liftDIF);
-   }while (rightP < Hatch3 && x_leftY < deadband && x_leftY > -deadband);
- }else{
-   
-   if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
-  rightLiftD.set(-fastDown );
-  leftLift.set(-fastDown + liftDIF);
-}
-else if(x_leftY <= -0.5 && !(x_right_bumper) && rightP < MAX  ){
-  rightLiftD.set(fast);
-  leftLift.set(fast + liftDIF);
-}
-else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
-  rightLiftD.set(-slowDown );
-  leftLift.set(-slowDown + liftDIF);
-}
-  else if(x_leftY <= -0.25 && !(x_right_bumper) && rightP < MAX){
-  rightLiftD.set(slow );
-  leftLift.set(slow + liftDIF);
-}
-  else {if(x_leftY > deadband && x_right_bumper && rightP > MIN){
-    rightLiftD.set(-slowDown);
-    leftLift.set(-slowDown + liftDIF);
-  }
-  else if(x_leftY < -0.25 && x_right_bumper  && rightP < MAX){
-    rightLiftD.set(slow );
-    leftLift.set(slow + liftDIF);
-  }
-  else{
-    rightLiftD.set(0);
-    leftLift.set(0 + liftDIF);
-      }
-    }
-  }
-}
+// else if (rightP > Hatch1 && rightP <= Hatch2 && xPOV == 180){
+//   do {
+//     rightLiftD.set(-fastDown);
+//    }while (rightP > Hatch1 && x_leftY < deadband && x_leftY > -deadband);
+//    //3-2
+//  }else if (rightP > Hatch2 && rightP <= Hatch3 && xPOV == 180) { 
+//   do {
+//     rightLiftD.set(-fastDown);
+//    }while (rightP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+//  }else if (rightP > Hatch3 && xPOV == 180) { 
+//   do {
+//     rightLiftD.set(-fastDown);
+//    }while (rightP < Hatch3 && x_leftY < deadband && x_leftY > -deadband);
+//  }else{
+
+// //    if(x_leftY >= 0.5 && !(x_right_bumper) && rightP > MIN) {
+// //   rightLiftD.set(-fastDown );
+// // }
+// // else if(x_leftY <= -0.5 && !(x_right_bumper) && rightP < MAX  ){
+// //   rightLiftD.set(fast);
+// // }
+// // else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
+// //   rightLiftD.set(-slowDown );
+// // }
+// //   else if(x_leftY <= -0.25 && !(x_right_bumper) && rightP < MAX){
+// //   rightLiftD.set(slow );
+// // }
+// //   else {if(x_leftY > deadband && x_right_bumper && rightP > MIN){
+// //     rightLiftD.set(-slowDown);
+// //   }
+// //   else if(x_leftY < -0.25 && x_right_bumper  && rightP < MAX){
+// //     rightLiftD.set(slow );
+// //   }
+// //   else{
+// //     rightLiftD.set(0);
+// //       }
+// //     }
+// //   }
+// }
+// // end of the first one //////////////////////////////////////////////////////////////////////////////
+// if (leftP < Ball1 && xPOV == 90){
+//   do {
+//   leftLift.set(fast /*+ liftDIF*/);
+//     } while (leftP < Ball1 && x_leftY < deadband && x_leftY > -deadband);
+//  }
+//  else if (leftP < Ball2 && leftP >= Ball1 && xPOV == 90){
+//  do {
+//   leftLift.set(fast /*+ liftDIF*/);
+// } while (leftP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+// }else if(leftP < Ball3 && leftP >= Ball2 && xPOV == 90){
+// do {
+//   leftLift.set(fast /*+ liftDIF*/);
+// } while (leftP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+
+// // down with balls
+// }else if (leftP > Ball1 && leftP <= Ball2 && xPOV == 270){
+//   do {
+//     leftLift.set(-fastDown /*+ liftDIF*/);
+//    }while (leftP > Ball1 && x_leftY < deadband && x_leftY > -deadband);
+//    //3-2
+//  }else if (leftP > Ball2 && leftP <= Ball3 && xPOV == 270) { 
+//   do {
+//     leftLift.set(-fastDown /*+ liftDIF*/);
+//    }while (leftP < Ball2 && x_leftY < deadband && x_leftY > -deadband);
+//  }else if (leftP > Ball3 && xPOV == 270) { 
+//   do {
+//     leftLift.set(-fastDown /*+ liftDIF*/);
+//    }while (leftP < Ball3 && x_leftY < deadband && x_leftY > -deadband);
+//  }
+//  //up hatch
+//  if (leftP < Hatch1 && xPOV == 0){
+//   do {
+//   leftLift.set(fast /*+ liftDIF*/);
+//     } while (leftP < Hatch1 && x_leftY < deadband && x_leftY > -deadband);
+//  }
+//  else if (leftP < Hatch2 && leftP >= Hatch1 && xPOV == 0){
+//  do {
+//   leftLift.set(fast /*+ liftDIF*/);
+// } while (leftP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+// }else if(leftP < Hatch3 && leftP >= Hatch2 && xPOV == 0){
+// do {
+//   leftLift.set(fast /*+ liftDIF*/);
+// } while (leftP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+// }else if (leftP > Hatch1 && leftP <= Hatch2 && xPOV == 180){
+// do {
+//   leftLift.set(-fastDown /*+ liftDIF*/);
+//  }while (leftP > Hatch1 && x_leftY < deadband && x_leftY > -deadband);
+//  //3-2
+// }else if (leftP > Hatch2 && leftP <= Hatch3 && xPOV == 180) { 
+// do {
+//   leftLift.set(-fastDown /*+ liftDIF*/);
+//  }while (leftP < Hatch2 && x_leftY < deadband && x_leftY > -deadband);
+// }else if (leftP > Hatch3 && xPOV == 180) { 
+// do {
+//   leftLift.set(-fastDown /*+ liftDIF*/);
+//  }while (leftP < Hatch3 && x_leftY < deadband && x_leftY > -deadband);
+// }else{
+
+//  if(x_leftY >= 0.5 && !(x_right_bumper) && leftP > MIN) {
+// leftLift.set(-fastDown /*+ liftDIF*/);
+// }
+// else if(x_leftY <= -0.5 && !(x_right_bumper) && leftP < MAX  ){
+// leftLift.set(fast /*+ liftDIF*/);
+// }
+// else{if(x_leftY >= 0.25 && !(x_right_bumper) && leftP > MIN){
+// leftLift.set(-slowDown /*+ liftDIF*/);
+// }
+// else if(x_leftY <= -0.25 && !(x_right_bumper) && leftP < MAX){
+// leftLift.set(slow /*+ liftDIF*/);
+// }
+// else {if(x_leftY > deadband && x_right_bumper && leftP > MIN){
+//   leftLift.set(-slowDown /*+ liftDIF*/);
+// }
+// else if(x_leftY < -0.25 && x_right_bumper  && leftP < MAX){
+//   leftLift.set(slow /*+ liftDIF*/);
+// }
+// else{
+//   leftLift.set(0 /*+ liftDIF*/);
+//     }
+//   }
+// }
+//}
 
    //tilt
     if(x_aButton == true && x_bButton == false){
@@ -397,11 +493,11 @@ else{if(x_leftY >= 0.25 && !(x_right_bumper) && rightP > MIN){
     }
     //gate
     
-    if(x_Ybutton && !(x_Xbutton)){
-        gate.setAngle(90);
-       }else if(!(x_Ybutton) && (x_Xbutton)){
-        gate.setAngle(0);
-       }else{}
+    // if(x_Ybutton && !(x_Xbutton)){
+    //     gate.setAngle(90);
+    //    }else if(!(x_Ybutton) && (x_Xbutton)){
+    //     gate.setAngle(0);
+    //    }else{}
 
   }
 }
